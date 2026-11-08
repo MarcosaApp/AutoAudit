@@ -1,0 +1,25 @@
+@startuml
+actor Usuario
+participant "Laboratorio Bootstrap" as UI
+participant "PHP (PDO)" as PHP
+database "public.clientes" as Clientes
+participant "Trigger AFTER" as Trigger
+database "auditoria.bitacora_eventos" as Eventos
+database "auditoria.bitacora_detalles" as Detalles
+Usuario -> UI : Actualizar teléfono
+UI -> PHP : POST con CSRF
+PHP -> PHP : beginTransaction()
+PHP -> PHP : set_config(usuario, estación, IP)
+PHP -> Clientes : UPDATE ...
+Clientes -> Trigger : AFTER UPDATE (OLD, NEW)
+Trigger -> Trigger : Comparar columnas monitorizadas
+alt Hay cambios distintos
+  Trigger -> Eventos : INSERT encabezado + instantáneas
+  Trigger -> Detalles : INSERT por columna cambiada
+else No cambia columna auditada
+  Trigger --> Clientes : No registrar evento
+end
+Clientes --> PHP : Cambio confirmado
+PHP -> PHP : commit()
+PHP --> UI : Resultado
+@enduml

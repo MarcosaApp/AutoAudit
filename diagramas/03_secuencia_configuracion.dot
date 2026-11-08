@@ -1,0 +1,24 @@
+digraph UML {
+    graph [rankdir=LR, fontname="DejaVu Sans", fontsize=11, bgcolor="white",
+           nodesep=0.55, ranksep=0.7, pad=0.3, splines=polyline];
+    node [fontname="DejaVu Sans", fontsize=10, shape=box, style="rounded,filled",
+          color="#7c8eae", fillcolor="#edf2fc", margin="0.20,0.13"];
+    edge [fontname="DejaVu Sans", fontsize=9, color="#62799c", arrowsize=0.8];
+    
+admin [label="Administrador",fillcolor="#dce7ff"];
+ui [label="Bootstrap / HTML"];
+php [label="PHP / validación"];
+config [label="configurar_tabla()"];
+gen [label="generar_triggers()"];
+pg [label="Catálogo / triggers PostgreSQL",fillcolor="#ecf9ee"];
+admin -> ui [label="selecciona columnas"];
+ui -> php [label="POST + CSRF"];
+php -> pg [label="consulta catálogo"];
+php -> config [label="JSONB"];
+config -> pg [label="guarda reglas"];
+config -> gen [label="regenera"];
+gen -> pg [label="DROP / CREATE TRIGGER AFTER"];
+pg -> php [label="resultado", style=dashed];
+php -> ui [label="confirmación", style=dashed];
+
+}

@@ -1,0 +1,25 @@
+digraph UML {
+    graph [rankdir=LR, fontname="DejaVu Sans", fontsize=11, bgcolor="white",
+           nodesep=0.55, ranksep=0.7, pad=0.3, splines=polyline];
+    node [fontname="DejaVu Sans", fontsize=10, shape=box, style="rounded,filled",
+          color="#7c8eae", fillcolor="#edf2fc", margin="0.20,0.13"];
+    edge [fontname="DejaVu Sans", fontsize=9, color="#62799c", arrowsize=0.8];
+    
+usuario [label="Usuario"];
+web [label="Interfaz web"];
+php [label="PHP + transacción"];
+clientes [label="Tabla public.clientes"];
+trigger [label="Trigger AFTER / OLD-NEW",fillcolor="#e1e8ff"];
+eventos [label="bitacora_eventos",fillcolor="#e3f5eb"];
+detalles [label="bitacora_detalles",fillcolor="#e3f5eb"];
+usuario -> web [label="editar teléfono"];
+web -> php [label="POST CSRF"];
+php -> clientes [label="SET contexto + UPDATE"];
+clientes -> trigger [label="AFTER UPDATE"];
+trigger -> trigger [label="comparar valores"];
+trigger -> eventos [label="INSERT si cambió"];
+eventos -> detalles [label="INSERT por columna"];
+clientes -> php [label="resultado", style=dashed];
+php -> web [label="COMMIT", style=dashed];
+
+}

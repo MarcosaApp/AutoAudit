@@ -1,0 +1,59 @@
+@startuml
+hide circle
+entity usuarios {
+  *id_usuario : BIGINT <<PK>>
+  --
+  nombre_usuario : VARCHAR UNIQUE
+  contrasena_hash : TEXT
+  rol : VARCHAR
+}
+entity estaciones_trabajo {
+  *id_estacion : BIGINT <<PK>>
+  --
+  identificador : VARCHAR UNIQUE
+  direccion_ip : INET
+}
+entity tablas_auditadas {
+  *id_tabla : BIGINT <<PK>>
+  --
+  nombre_esquema : TEXT
+  nombre_tabla : TEXT
+  activa : BOOLEAN
+  version_configuracion : INT
+}
+entity columnas_auditadas {
+  *id_columna : BIGINT <<PK>>
+  --
+  id_tabla : BIGINT <<FK>>
+  nombre_columna : TEXT
+}
+entity reglas_auditoria {
+  *id_regla : BIGINT <<PK>>
+  --
+  id_columna : BIGINT <<FK>>
+  operacion : VARCHAR
+}
+entity bitacora_eventos {
+  *id_evento : BIGINT <<PK>>
+  --
+  id_tabla : BIGINT <<FK>>
+  id_usuario : BIGINT <<FK, nullable>>
+  id_estacion : BIGINT <<FK, nullable>>
+  registro_anterior : JSONB
+  registro_nuevo : JSONB
+}
+entity bitacora_detalles {
+  *id_detalle : BIGINT <<PK>>
+  --
+  id_evento : BIGINT <<FK>>
+  nombre_columna : TEXT
+  valor_anterior : JSONB
+  valor_nuevo : JSONB
+}
+tablas_auditadas ||--o{ columnas_auditadas
+columnas_auditadas ||--o{ reglas_auditoria
+tablas_auditadas ||--o{ bitacora_eventos
+usuarios o|--o{ bitacora_eventos
+estaciones_trabajo o|--o{ bitacora_eventos
+bitacora_eventos ||--o{ bitacora_detalles
+@enduml

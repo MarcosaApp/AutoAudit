@@ -1,0 +1,25 @@
+@startuml
+start
+:Entrar a AutoAudit;
+:Autenticarse;
+if (¿Administrador?) then (sí)
+  :Elegir tabla existente;
+  :Seleccionar columnas y eventos;
+  :Validar catálogo de PostgreSQL;
+  :Guardar configuración;
+  :Regenerar triggers AFTER;
+endif
+:Realizar INSERT, UPDATE o DELETE;
+:Disparar trigger de tabla origen;
+if (¿Existe regla activa para evento?) then (sí)
+  if (¿UPDATE con cambio real?) then (sí)
+    :Registrar evento y valores OLD/NEW;
+  else (no)
+    :No registrar cambios idénticos;
+  endif
+else (no)
+  :No generar evento;
+endif
+:Consultar, filtrar y exportar bitácora;
+stop
+@enduml

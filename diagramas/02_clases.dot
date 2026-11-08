@@ -1,0 +1,19 @@
+digraph UML {
+    graph [rankdir=LR, fontname="DejaVu Sans", fontsize=11, bgcolor="white",
+           nodesep=0.55, ranksep=0.7, pad=0.3, splines=polyline];
+    node [fontname="DejaVu Sans", fontsize=10, shape=box, style="rounded,filled",
+          color="#7c8eae", fillcolor="#edf2fc", margin="0.20,0.13"];
+    edge [fontname="DejaVu Sans", fontsize=9, color="#62799c", arrowsize=0.8];
+    
+tabla [shape=record, label="{TablaAuditada|+ id_tabla : BIGINT\l+ esquema : TEXT\l+ nombre_tabla : TEXT\l+ activa : BOOLEAN\l+ version : INTEGER\l}"];
+columna [shape=record, label="{ColumnaAuditada|+ id_columna : BIGINT\l+ nombre_columna : TEXT\l+ activa : BOOLEAN\l}"];
+regla [shape=record, label="{ReglaAuditoria|+ id_regla : BIGINT\l+ operacion : INSERT/UPDATE/DELETE\l}"];
+evento [shape=record, label="{BitacoraEvento|+ id_evento : BIGINT\l+ operacion : TEXT\l+ fecha : TIMESTAMPTZ\l+ OLD : JSONB\l+ NEW : JSONB\l}"];
+detalle [shape=record, label="{BitacoraDetalle|+ columna : TEXT\l+ OLD : JSONB\l+ NEW : JSONB\l}"];
+usuario [shape=record, label="{Usuario|+ id_usuario : BIGINT\l+ nombre_usuario : TEXT\l+ rol : TEXT\l}"];
+estacion [shape=record, label="{EstacionTrabajo|+ id_estacion : BIGINT\l+ ip : INET\l}"];
+tabla -> columna [label="1 → 0..*"]; columna -> regla [label="1 → 0..*"];
+tabla -> evento [label="1 → 0..*"]; evento -> detalle [label="1 → 1..*", arrowhead=diamond];
+usuario -> evento [label="0..1 → 0..*"]; estacion -> evento [label="0..1 → 0..*"];
+
+}

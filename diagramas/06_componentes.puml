@@ -1,0 +1,23 @@
+@startuml
+skinparam componentStyle rectangle
+node "Ubuntu 26.04 LTS / Docker" {
+  node "web: PHP 8.3 + Apache" {
+    [Bootstrap 5.3] as Bootstrap
+    [Controlador PHP / PDO] as Controlador
+    [Validación, sesión, CSRF] as Seguridad
+    Bootstrap --> Controlador
+    Controlador --> Seguridad
+  }
+  database "bd: PostgreSQL 18" {
+    [Esquema auditoria] as Auditoria
+    [Tablas de demostración public] as Public
+    [Generador de triggers PL/pgSQL] as Generador
+    [Bitácora eventos + detalles] as Bitacora
+    Generador --> Public
+    Public --> Bitacora : triggers AFTER
+    Auditoria --> Generador
+  }
+  Controlador --> Auditoria : SQL parametrizado
+  Controlador --> Public : INSERT / UPDATE / DELETE
+}
+@enduml

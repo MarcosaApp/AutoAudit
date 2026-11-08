@@ -1,0 +1,14 @@
+:root{--acento:#3e55b4;--base:#141d3a;--fondo:#f5f7fc}
+body{background:var(--fondo);color:#24304b;min-height:100vh}
+.barra-superior{background:linear-gradient(120deg,#121a35,#3c4287)}
+.marca-circulo{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:8px;background:#7a80ed;margin-right:5px}
+.panel{border:1px solid #e4e9f4;border-radius:14px;background:white;box-shadow:0 7px 30px rgba(26,39,74,.035)}
+.numero-panel{font-size:2.2rem;font-weight:800;color:var(--acento)}
+.etiqueta-pequena{letter-spacing:.09em;text-transform:uppercase;font-size:.72rem;font-weight:800;color:#697794}
+.tabla-borde{border-collapse:separate;border-spacing:0}
+.tabla-borde th{color:#5c6781;font-size:.83rem}
+.tabla-borde td{vertical-align:middle}
+.bloque-json{white-space:pre-wrap;word-break:break-word;padding:.8rem;border-radius:8px;background:#f1f4fc;max-height:360px;overflow:auto}
+.pie-pagina{border-top:1px solid #e6e9f1;color:#8089a1}
+.celda-seleccion{background:#f8faff}
+@media(max-width:600px){.numero-panel{font-size:1.7rem}}

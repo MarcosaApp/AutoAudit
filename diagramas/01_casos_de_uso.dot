@@ -1,0 +1,23 @@
+digraph UML {
+    graph [rankdir=LR, fontname="DejaVu Sans", fontsize=11, bgcolor="white",
+           nodesep=0.55, ranksep=0.7, pad=0.3, splines=polyline];
+    node [fontname="DejaVu Sans", fontsize=10, shape=box, style="rounded,filled",
+          color="#7c8eae", fillcolor="#edf2fc", margin="0.20,0.13"];
+    edge [fontname="DejaVu Sans", fontsize=9, color="#62799c", arrowsize=0.8];
+    
+admin [shape=ellipse, fillcolor="#d9e3ff", label="Administrador"];
+lector [shape=ellipse, fillcolor="#d9e3ff", label="Usuario de consulta"];
+subgraph cluster_sistema {label="AutoAudit — casos de uso"; color="#b0bddd"; style="rounded";
+login [label="Iniciar sesión"]; explorar [label="Explorar tablas y columnas"];
+config [label="Configurar reglas"]; generador [label="Generar triggers AFTER"];
+pausar [label="Pausar / activar auditoría"]; lab [label="Probar INSERT / UPDATE / DELETE"];
+hist [label="Consultar historial"]; filtrar [label="Filtrar usuario / columna"];
+csv [label="Exportar CSV"];
+}
+admin -> login; admin -> explorar; admin -> config; admin -> pausar; admin -> lab; admin -> hist;
+lector -> login; lector -> hist; lector -> filtrar; lector -> csv;
+config -> generador [style=dashed, label="include"];
+filtrar -> hist [style=dashed, label="extend"];
+csv -> hist [style=dashed, label="extend"];
+
+}

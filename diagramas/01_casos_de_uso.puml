@@ -1,0 +1,30 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+actor "Administrador" as Administrador
+actor "Usuario de consulta" as Consulta
+rectangle "AutoAudit" {
+  usecase "Iniciar sesión" as UC1
+  usecase "Explorar tablas y columnas" as UC2
+  usecase "Configurar reglas por operación" as UC3
+  usecase "Generar triggers AFTER" as UC4
+  usecase "Pausar/reactivar auditoría" as UC5
+  usecase "Crear/editar/eliminar cliente" as UC6
+  usecase "Consultar historial" as UC7
+  usecase "Filtrar por usuario/columna" as UC8
+  usecase "Exportar CSV" as UC9
+}
+Administrador --> UC1
+Administrador --> UC2
+Administrador --> UC3
+Administrador --> UC5
+Administrador --> UC6
+Administrador --> UC7
+Consulta --> UC1
+Consulta --> UC7
+Consulta --> UC8
+Consulta --> UC9
+UC3 ..> UC4 : <<include>>
+UC8 ..> UC7 : <<extend>>
+UC9 ..> UC7 : <<extend>>
+@enduml

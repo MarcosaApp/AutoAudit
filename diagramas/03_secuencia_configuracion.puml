@@ -1,0 +1,23 @@
+@startuml
+actor Administrador
+participant "Interfaz Bootstrap" as UI
+participant "Controlador PHP" as PHP
+database "PostgreSQL 18" as PG
+participant "configurar_tabla()" as Config
+participant "generar_triggers()" as Gen
+Administrador -> UI : Seleccionar tabla, columnas y eventos
+UI -> PHP : POST + token CSRF
+PHP -> PG : Consultar catálogo y validar valores
+PHP -> Config : SELECT configurar_tabla(... JSONB)
+Config -> PG : Guardar tabla, columnas, reglas y versión
+Config -> Gen : regenerar triggers
+loop INSERT, UPDATE, DELETE
+  Gen -> PG : DROP TRIGGER IF EXISTS
+  alt Hay regla activa
+    Gen -> PG : CREATE TRIGGER AFTER ...
+  end
+end
+Gen --> Config : terminado
+Config --> PHP : id_tabla
+PHP --> UI : Mostrar confirmación
+@enduml

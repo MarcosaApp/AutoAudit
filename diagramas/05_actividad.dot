@@ -1,0 +1,32 @@
+digraph UML {
+    graph [rankdir=TB, fontname="DejaVu Sans", fontsize=11, bgcolor="white",
+           nodesep=0.55, ranksep=0.7, pad=0.3, splines=polyline];
+    node [fontname="DejaVu Sans", fontsize=10, shape=box, style="rounded,filled",
+          color="#7c8eae", fillcolor="#edf2fc", margin="0.20,0.13"];
+    edge [fontname="DejaVu Sans", fontsize=9, color="#62799c", arrowsize=0.8];
+    
+inicio [shape=oval,label="Inicio",fillcolor="#d6eff9"];
+login [label="Autenticarse"];
+admin [shape=diamond,label="¿Admin?"];
+config [label="Seleccionar tabla y reglas"];
+triggers [label="Validar y generar triggers"];
+cambio [label="Ejecutar INSERT / UPDATE / DELETE"];
+regla [shape=diamond,label="¿Regla activa?"];
+modificado [shape=diamond,label="¿Cambio real en UPDATE?"];
+guardar [label="Guardar evento y detalles",fillcolor="#ddf4e4"];
+ignorar [label="No crear evento",fillcolor="#fff2da"];
+consulta [label="Consultar / filtrar / CSV"];
+fin [shape=oval,label="Fin",fillcolor="#d6eff9"];
+inicio -> login -> admin;
+admin -> config [label="sí"]; config -> triggers -> cambio;
+admin -> cambio [label="no"];
+cambio -> regla;
+regla -> modificado [label="sí"];
+regla -> ignorar [label="no"];
+modificado -> guardar [label="sí o INSERT / DELETE"];
+modificado -> ignorar [label="sin cambios"];
+guardar -> consulta;
+ignorar -> consulta;
+consulta -> fin;
+
+}

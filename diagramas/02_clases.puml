@@ -1,0 +1,49 @@
+@startuml
+hide circle
+skinparam classAttributeIconSize 0
+class Usuario {
+  +id_usuario : bigint
+  +nombre_usuario : varchar
+  +rol : varchar
+}
+class EstacionTrabajo {
+  +id_estacion : bigint
+  +identificador : varchar
+  +direccion_ip : inet
+}
+class TablaAuditada {
+  +id_tabla : bigint
+  +nombre_esquema : text
+  +nombre_tabla : text
+  +activa : boolean
+  +version_configuracion : integer
+}
+class ColumnaAuditada {
+  +id_columna : bigint
+  +nombre_columna : text
+  +activa : boolean
+}
+class ReglaAuditoria {
+  +id_regla : bigint
+  +operacion : VARCHAR (INSERT / UPDATE / DELETE)
+}
+class BitacoraEvento {
+  +id_evento : bigint
+  +operacion : varchar
+  +registro_anterior : jsonb
+  +registro_nuevo : jsonb
+  +fecha_evento : timestamptz
+}
+class BitacoraDetalle {
+  +id_detalle : bigint
+  +nombre_columna : text
+  +valor_anterior : jsonb
+  +valor_nuevo : jsonb
+}
+TablaAuditada "1" -- "0..*" ColumnaAuditada
+ColumnaAuditada "1" -- "0..*" ReglaAuditoria
+TablaAuditada "1" -- "0..*" BitacoraEvento
+Usuario "0..1" -- "0..*" BitacoraEvento
+EstacionTrabajo "0..1" -- "0..*" BitacoraEvento
+BitacoraEvento "1" *-- "1..*" BitacoraDetalle
+@enduml

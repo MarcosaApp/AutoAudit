@@ -1,0 +1,23 @@
+digraph UML {
+    graph [rankdir=LR, fontname="DejaVu Sans", fontsize=11, bgcolor="white",
+           nodesep=0.55, ranksep=0.7, pad=0.3, splines=polyline];
+    node [fontname="DejaVu Sans", fontsize=10, shape=box, style="rounded,filled",
+          color="#7c8eae", fillcolor="#edf2fc", margin="0.20,0.13"];
+    edge [fontname="DejaVu Sans", fontsize=9, color="#62799c", arrowsize=0.8];
+    
+node [shape=record];
+usuarios [label="{usuarios|PK id_usuario\lnombre_usuario\lcontrasena_hash\lrol\l}"];
+estaciones [label="{estaciones_trabajo|PK id_estacion\lidentificador\ldireccion_ip\l}"];
+tablas [label="{tablas_auditadas|PK id_tabla\lesquema\ltabla\lversion_configuracion\l}"];
+columnas [label="{columnas_auditadas|PK id_columna\lFK id_tabla\lnombre_columna\l}"];
+reglas [label="{reglas_auditoria|PK id_regla\lFK id_columna\loperacion\l}"];
+eventos [label="{bitacora_eventos|PK id_evento\lFK id_tabla\lFK id_usuario (NULL)\lFK id_estacion (NULL)\lregistro_anterior / nuevo\l}"];
+detalles [label="{bitacora_detalles|PK id_detalle\lFK id_evento\lcolumna / OLD / NEW\l}"];
+tablas -> columnas [label="1 : N"];
+columnas -> reglas [label="1 : N"];
+tablas -> eventos [label="1 : N"];
+usuarios -> eventos [label="1 : N opcional"];
+estaciones -> eventos [label="1 : N opcional"];
+eventos -> detalles [label="1 : N"];
+
+}

@@ -1,0 +1,1465 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Manual AutoAudit</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+<link rel="stylesheet" href="manual_impresion.css" /></head>
+<body>
+
+<h1
+id="autoaudit--manual-de-ejecución-estudio-y-explicación-del-código">AutoAudit
+— Manual de ejecución, estudio y explicación del código</h1>
+<p><strong>Proyecto:</strong> Sistema de auditoría automatizada<br />
+<strong>Asignatura:</strong> Bases de Datos I<br />
+<strong>Base del alcance:</strong> enunciado «AutoAudit», Universidad
+Mariano Gálvez de Guatemala, septiembre de 2026<br />
+<strong>Tecnologías implementadas:</strong> PostgreSQL 18, PL/pgSQL, PHP
+8.3, PDO, Apache, Bootstrap 5.3.8 y Docker Compose.<br />
+<strong>Propósito del manual:</strong> instalar el proyecto, observar el
+efecto de cada trigger, reconocer las variables y comprender qué hace
+cada bloque.</p>
+<hr />
+<h2 id="1-qué-vas-a-construir-y-qué-problema-resuelve">1. ¿Qué vas a
+construir y qué problema resuelve?</h2>
+<p>En un sistema normal, cuando editas el teléfono de un cliente, el
+teléfono anterior desaparece de la fila del cliente. No sabes
+necesariamente quién lo cambió, cuándo ocurrió ni qué valor tenía
+antes.</p>
+<p><strong>AutoAudit</strong> es un segundo conjunto de tablas y
+funciones que almacena una evidencia de ese cambio. Permite decidir
+<strong>qué tabla</strong>, <strong>qué columna</strong> y <strong>qué
+operaciones</strong> vale la pena vigilar. No tienes que escribir un
+trigger diferente manualmente para cada columna: una función crea los
+disparadores cuando guardas las reglas.</p>
+<p>Ejemplo:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Acción</th>
+<th>Tabla <code>public.clientes</code></th>
+<th>Resultado en AutoAudit</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>INSERT</td>
+<td>Se crea Ana</td>
+<td>Guarda la fila nueva y los campos configurados</td>
+</tr>
+<tr class="even">
+<td>UPDATE</td>
+<td>Teléfono: <code>5555-1001</code> → <code>5555-9999</code></td>
+<td>Guarda valor anterior y nuevo</td>
+</tr>
+<tr class="odd">
+<td>UPDATE</td>
+<td>Nombre actualizado con el mismo contenido</td>
+<td>Si no hay cambio real en columnas auditadas, no registra evento</td>
+</tr>
+<tr class="even">
+<td>DELETE</td>
+<td>Se elimina Ana</td>
+<td>Guarda <code>OLD</code> completo aunque ya no exista en
+clientes</td>
+</tr>
+</tbody>
+</table>
+<p>La <strong>base de datos contiene la lógica de auditoría</strong>;
+PHP se encarga de las pantallas, el inicio de sesión y el contexto
+(usuario, estación, IP). Bootstrap aporta presentación visual, pero no
+sustituye las funciones SQL.</p>
+<h3 id="11-qué-es-un-trigger">1.1 ¿Qué es un trigger?</h3>
+<p>Un <em>trigger</em> o disparador es una instrucción que PostgreSQL
+ejecuta <strong>automáticamente</strong> cuando ocurre un evento en una
+tabla. En este proyecto se usan:</p>
+<ul>
+<li><code>AFTER INSERT</code>: se ejecuta después de crear una
+fila.</li>
+<li><code>AFTER UPDATE</code>: se ejecuta después de actualizar una
+fila.</li>
+<li><code>AFTER DELETE</code>: se ejecuta después de eliminar una
+fila.</li>
+</ul>
+<p>El trigger recibe los datos especiales <code>NEW</code> (versión
+nueva) y <code>OLD</code> (versión anterior), más <code>TG_OP</code>
+(nombre de operación) y <code>TG_TABLE_NAME</code> (tabla que lo
+ejecutó).</p>
+<p><strong>Diferencia importante:</strong> el trigger no es la bitácora.
+El trigger <strong>detecta y llama</strong> a
+<code>registrar_cambio()</code>; esa función <strong>escribe los
+datos</strong> en las tablas de bitácora.</p>
+<h3 id="12-plsql-frente-a-plpgsql">1.2 PL/SQL frente a PL/pgSQL</h3>
+<p>El enunciado llama al lenguaje de los triggers «PL/SQL».
+<strong>PL/SQL</strong> es la denominación habitual del lenguaje
+procedural de Oracle. En <strong>PostgreSQL 18</strong> el lenguaje
+utilizado aquí se llama <strong>PL/pgSQL</strong>
+(<code>LANGUAGE plpgsql</code>). Se conserva el objetivo académico del
+enunciado, usando el lenguaje propio del motor requerido.</p>
+<hr />
+<h2 id="2-estructura-de-carpetas-en-palabras-sencillas">2. Estructura de
+carpetas, en palabras sencillas</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Elemento</th>
+<th>Qué es</th>
+<th>¿Cuándo lo abres?</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>.env.ejemplo</code></td>
+<td>Modelo de credenciales, puertos y primer admin</td>
+<td>Antes de ejecutar</td>
+</tr>
+<tr class="even">
+<td><code>compose.yaml</code></td>
+<td>Orquesta un servidor PostgreSQL y un servidor web</td>
+<td>Para iniciar el sistema</td>
+</tr>
+<tr class="odd">
+<td><code>app/Dockerfile</code></td>
+<td>Instala PHP, Apache y <code>pdo_pgsql</code></td>
+<td>Para entender el servidor</td>
+</tr>
+<tr class="even">
+<td><code>app/public/index.php</code></td>
+<td>Rutas, formularios y lógica principal de pantallas</td>
+<td>Para estudiar frontend/backend</td>
+</tr>
+<tr class="odd">
+<td><code>app/src/BaseDatos.php</code></td>
+<td>Conexión a PostgreSQL con PDO</td>
+<td>Para estudiar la conexión</td>
+</tr>
+<tr class="even">
+<td><code>app/src/Seguridad.php</code></td>
+<td>Inicio de sesión, roles, CSRF y contexto del trigger</td>
+<td>Para estudiar autenticación</td>
+</tr>
+<tr class="odd">
+<td><code>app/src/Consultas.php</code></td>
+<td>Diccionario de datos y consultas de historial</td>
+<td>Para estudiar SELECT con parámetros</td>
+</tr>
+<tr class="even">
+<td><code>app/src/Presentacion.php</code></td>
+<td>Encabezado, menú y pie de página Bootstrap</td>
+<td>Para estudiar la interfaz</td>
+</tr>
+<tr class="odd">
+<td><code>01_roles.sh</code></td>
+<td>Crea el usuario de BD para la app web</td>
+<td>Solo instalación inicial</td>
+</tr>
+<tr class="even">
+<td><code>02_estructura.sql</code></td>
+<td>Crea todas las tablas e índices</td>
+<td>Para estudiar DDL</td>
+</tr>
+<tr class="odd">
+<td><code>03_funciones.sql</code></td>
+<td>Crea funciones, comparación OLD/NEW y triggers dinámicos</td>
+<td><strong>Parte más importante</strong></td>
+</tr>
+<tr class="even">
+<td><code>04_permisos.sql</code></td>
+<td>Limita lo que la aplicación puede modificar</td>
+<td>Para estudiar roles y permisos</td>
+</tr>
+<tr class="odd">
+<td><code>05_admin.sh</code></td>
+<td>Crea el primer usuario administrador de la web</td>
+<td>Solo instalación inicial</td>
+</tr>
+<tr class="even">
+<td><code>base_de_datos/pruebas/</code></td>
+<td>Pruebas funcionales, carga y catálogo</td>
+<td>Para validar el sistema</td>
+</tr>
+<tr class="odd">
+<td><code>diagramas/</code></td>
+<td>UML y ER en <code>.puml</code>, <code>.dot</code>, <code>.svg</code>
+y <code>.png</code></td>
+<td>Para documentación / explicación</td>
+</tr>
+</tbody>
+</table>
+<p>Los archivos se enumeran en el orden en que resulta más sencillo
+comprenderlos.</p>
+<hr />
+<h2 id="3-instalación-desde-cero-en-ubuntu-2604-lts">3. Instalación
+desde cero en Ubuntu 26.04 LTS</h2>
+<h3 id="31-requisitos-previos">3.1 Requisitos previos</h3>
+<p>Necesitas una computadora con:</p>
+<ul>
+<li>Ubuntu 26.04 LTS, o Windows/macOS con una instalación compatible de
+Docker.</li>
+<li>Docker Engine (o Docker Desktop) y complemento <strong>Docker
+Compose</strong> que funcione con <code>docker compose</code>.</li>
+<li>Espacio de disco suficiente para descargar las imágenes de
+PostgreSQL y PHP.</li>
+<li>Conexión a Internet <strong>durante la primera instalación</strong>
+y para cargar el CSS/JS de Bootstrap desde CDN.</li>
+<li>Una terminal: en Ubuntu puedes usar
+<code>Ctrl + Alt + T</code>.</li>
+</ul>
+<p>Para instalar Docker en Ubuntu se recomienda seguir la <strong>guía
+oficial del fabricante</strong> para la versión actual de Ubuntu:
+<code>https://docs.docker.com/engine/install/ubuntu/</code>. El
+repositorio o paquete disponible cambia con la versión del sistema; por
+eso se comprueba primero en lugar de suponer que una orden específica de
+paquetes funcionará.</p>
+<p>Verifica ambas herramientas:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> <span class="at">--version</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> compose version</span></code></pre></div>
+<p>Si alguna orden no existe, primero instala o configura Docker.
+<strong>No hace falta instalar PHP, Apache ni PostgreSQL
+manualmente</strong> cuando se utiliza este método.</p>
+<h3 id="32-descomprimir-y-entrar-al-directorio">3.2 Descomprimir y
+entrar al directorio</h3>
+<p>Guarda el ZIP en Descargas. Desde la terminal:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ~/Descargas</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">unzip</span> AutoAudit_Proyecto_Completo.zip</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> AutoAudit_Proyecto</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> <span class="at">-la</span></span></code></pre></div>
+<p>Si descomprimiste el ZIP mediante el explorador de archivos, abre una
+terminal dentro de <code>AutoAudit_Proyecto</code>. <code>ls -la</code>
+debe mostrar <code>compose.yaml</code>, <code>.env.ejemplo</code>,
+<code>app/</code> y <code>base_de_datos/</code>.</p>
+<h3 id="33-preparar-variables-de-entorno">3.3 Preparar variables de
+entorno</h3>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> .env.ejemplo .env</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">nano</span> .env</span></code></pre></div>
+<p>Modifica por lo menos las claves:</p>
+<pre class="text"><code>POSTGRES_PASSWORD=TU_CLAVE_PRIVADA_DE_POSTGRES
+AUTOAUDIT_CLAVE_APP=OTRA_CLAVE_PRIVADA_PARA_PHP
+AUTOAUDIT_ADMIN_USUARIO=administrador
+AUTOAUDIT_ADMIN_CLAVE=TU_CLAVE_DE_ACCESO_WEB</code></pre>
+<p>El usuario de PostgreSQL <code>postgres</code> administra el motor;
+<code>autoaudit_aplicacion</code> es un usuario distinto, creado con la
+clave <code>AUTOAUDIT_CLAVE_APP</code>. El usuario
+<code>administrador</code> inicia sesión <strong>en el
+navegador</strong>, no directamente en PostgreSQL.</p>
+<p><strong>Nunca subas el archivo <code>.env</code> a un repositorio
+público.</strong> Ya está incluido en <code>.gitignore</code>.</p>
+<h3 id="34-construir-e-iniciar-el-sistema">3.4 Construir e iniciar el
+sistema</h3>
+<p>Ejecuta desde la carpeta raíz:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> compose up <span class="at">-d</span> <span class="at">--build</span></span></code></pre></div>
+<p>La primera vez Docker descarga las imágenes, compila la extensión de
+PHP y crea automáticamente las tablas, funciones, roles y usuario
+inicial.</p>
+<p>Para saber qué contenedores arrancaron:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> compose ps</span></code></pre></div>
+<p>Debes ver los servicios <code>bd</code> y <code>web</code>. Si
+aparecen errores:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> compose logs <span class="at">--tail</span><span class="op">=</span>100 bd</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> compose logs <span class="at">--tail</span><span class="op">=</span>100 web</span></code></pre></div>
+<p>Abre <strong><code>http://localhost:8080</code></strong>. Si
+cambiaste <code>PUERTO_WEB</code> en <code>.env</code>, usa ese
+puerto.</p>
+<p>Escribe las credenciales de
+<strong><code>AUTOAUDIT_ADMIN_USUARIO</code></strong> y
+<strong><code>AUTOAUDIT_ADMIN_CLAVE</code></strong>. El administrador
+podrá entrar a las cuatro pantallas: Panel, Configuración, Laboratorio e
+Historial.</p>
+<h3 id="35-acceso-opcional-desde-pgadmin">3.5 Acceso opcional desde
+pgAdmin</h3>
+<p>Puedes conectar pgAdmin al servidor de PostgreSQL usando:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Parámetro</th>
+<th>Valor</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Host</td>
+<td><code>localhost</code></td>
+</tr>
+<tr class="even">
+<td>Puerto</td>
+<td><code>5433</code> (o <code>PUERTO_POSTGRES</code>)</td>
+</tr>
+<tr class="odd">
+<td>Base de datos</td>
+<td><code>autoaudit</code></td>
+</tr>
+<tr class="even">
+<td>Usuario</td>
+<td><code>postgres</code></td>
+</tr>
+<tr class="odd">
+<td>Contraseña</td>
+<td>El valor de <code>POSTGRES_PASSWORD</code></td>
+</tr>
+</tbody>
+</table>
+<p>El esquema <code>auditoria</code> contiene el sistema de auditoría;
+el esquema <code>public</code> contiene las tablas ficticias de
+<code>clientes</code> y <code>productos</code>.</p>
+<p>Si pgAdmin está instalado <strong>dentro de otro contenedor</strong>,
+<code>localhost</code> ya no apunta al servicio de PostgreSQL; usa el
+nombre de red <code>bd</code> y el puerto interno <code>5432</code>.</p>
+<h3 id="36-cómo-detener-y-reiniciar">3.6 ¿Cómo detener y reiniciar?</h3>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Detiene los contenedores, conservando los datos.</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> compose down</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Vuelve a iniciarlos conservando los datos.</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> compose up <span class="at">-d</span></span></code></pre></div>
+<p><strong>Nunca ejecutes <code>docker compose down -v</code> si quieres
+conservar el proyecto</strong>: el parámetro <code>-v</code> destruye el
+volumen de PostgreSQL. Los scripts de inicialización <code>.sql</code> y
+<code>.sh</code> se ejecutan en una base <strong>nueva</strong>, no cada
+vez que reinicias Docker.</p>
+<hr />
+<h2 id="4-primer-ejercicio-guiado-crear-y-comprobar-un-trigger">4.
+Primer ejercicio guiado: crear y comprobar un trigger</h2>
+<h3 id="paso-1-seleccionar-la-tabla">Paso 1: seleccionar la tabla</h3>
+<p>En el menú <strong>Configuración</strong>, elige
+<code>public.clientes</code> y presiona <strong>Ver columnas</strong>.
+Las columnas no se escribieron manualmente dentro de la pantalla; el
+código consulta el catálogo de PostgreSQL.</p>
+<h3 id="paso-2-seleccionar-reglas">Paso 2: seleccionar reglas</h3>
+<p>Marca las casillas siguientes:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Columna</th>
+<th>INSERT</th>
+<th>UPDATE</th>
+<th>DELETE</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>nombre</td>
+<td>Sí</td>
+<td>Sí</td>
+<td>Sí</td>
+</tr>
+<tr class="even">
+<td>telefono</td>
+<td>Sí</td>
+<td>Sí</td>
+<td>Sí</td>
+</tr>
+<tr class="odd">
+<td>correo</td>
+<td>No</td>
+<td>Sí</td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<p>Deja las otras casillas desmarcadas. Haz clic en <strong>Guardar
+reglas y generar triggers</strong>.</p>
+<h3 id="paso-3-comprobar-los-triggers-desde-sql">Paso 3: comprobar los
+triggers desde SQL</h3>
+<p>Conecta por pgAdmin o por terminal:</p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> compose exec bd psql <span class="at">-U</span> postgres <span class="at">-d</span> autoaudit</span></code></pre></div>
+<p>Dentro de <code>psql</code> ejecuta:</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode sql"><code class="sourceCode sql"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> trigger_name, event_object_table, event_manipulation</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> information_schema.<span class="kw">triggers</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> trigger_name <span class="kw">LIKE</span> <span class="st">&#39;tr_autoaudit_%&#39;</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> event_object_table, trigger_name;</span></code></pre></div>
+<p>Deberás encontrar tres triggers asociados a la tabla
+<code>clientes</code>: uno por INSERT, otro por UPDATE y otro por
+DELETE.</p>
+<h3 id="paso-4-generar-una-modificación">Paso 4: generar una
+modificación</h3>
+<p>Abre el menú <strong>Laboratorio</strong>. Crea un cliente ficticio,
+por ejemplo:</p>
+<pre class="text"><code>Nombre: Carla Pérez
+Correo: carla.ejemplo@example.com
+Teléfono: 5000-1111</code></pre>
+<p>Después haz clic en <strong>Editar</strong> y cambia el teléfono a
+<code>5000-2222</code>. Finalmente, puedes eliminar ese cliente de
+prueba.</p>
+<h3 id="paso-5-comprobar-old-y-new">Paso 5: comprobar OLD y NEW</h3>
+<p>En <strong>Historial</strong>, filtra por tabla
+<code>clientes</code>, operación <code>UPDATE</code> y columna
+<code>telefono</code>. Presiona <strong>Detalle</strong>. Debes ver el
+número anterior y el nuevo, el usuario, fecha, IP y las instantáneas
+completas de la fila.</p>
+<p>Este es el objetivo principal de AutoAudit: no solo actualizar datos,
+sino conservar evidencia de <strong>qué pasó</strong>.</p>
+<hr />
+<h2 id="5-bloques-de-código-sql-explicados-uno-por-uno">5. Bloques de
+código SQL, explicados uno por uno</h2>
+<h3 id="51-02_estructurasql--crear-las-entidades">5.1
+<code>02_estructura.sql</code> — Crear las entidades</h3>
+<p><strong>Bloque A: esquema de auditoría.</strong></p>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode sql"><code class="sourceCode sql"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">SCHEMA</span> <span class="cf">IF</span> <span class="kw">NOT</span> <span class="kw">EXISTS</span> auditoria;</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> EXTENSION <span class="cf">IF</span> <span class="kw">NOT</span> <span class="kw">EXISTS</span> pgcrypto;</span></code></pre></div>
+<ul>
+<li><code>CREATE SCHEMA</code> separa las tablas de auditoría de los
+datos de negocio de <code>public</code>.</li>
+<li><code>pgcrypto</code> permite crear el hash bcrypt del usuario
+inicial. No guarda la clave en texto plano.</li>
+</ul>
+<p><strong>Bloque B: usuarios y estaciones.</strong>
+<code>auditoria.usuarios</code> incluye el nombre, el hash de
+contraseña, el rol y si está activo.
+<code>auditoria.estaciones_trabajo</code> guarda una huella construida
+desde IP y navegador y la fecha de último acceso. Esa huella <strong>no
+garantiza</strong> identificar un dispositivo físico: dos sesiones con
+la misma IP y user-agent pueden compartirla.</p>
+<p><strong>Bloque C: configuración de la tabla.</strong>
+<code>tablas_auditadas</code> contiene <code>nombre_esquema</code>,
+<code>nombre_tabla</code>, <code>activa</code> y
+<code>version_configuracion</code>. <code>columnas_auditadas</code>
+mantiene las columnas y <code>reglas_auditoria</code> mantiene las
+operaciones por columna.</p>
+<p><strong>Bloque D: bitácora.</strong> <code>bitacora_eventos</code>
+registra el evento completo, y <code>bitacora_detalles</code> guarda
+<strong>una fila por cada columna vigilada que participó en ese
+evento</strong>. Esta separación ayuda a consultar por columna sin tener
+que buscar dentro de documentos JSON grandes.</p>
+<p><strong>Bloque E: índices.</strong> Los índices sobre fecha, usuario
+y tabla hacen más eficientes las búsquedas recurrentes, aunque aumentan
+trabajo y almacenamiento al insertar auditorías.</p>
+<p><strong>Bloque F: laboratorio.</strong> <code>public.clientes</code>
+y <code>public.productos</code> son tablas completamente ficticias para
+practicar; no contienen clientes reales.</p>
+<h3 id="52-03_funcionessql--función-a-obtener_o_crear_estacion">5.2
+<code>03_funciones.sql</code> — Función A:
+<code>obtener_o_crear_estacion()</code></h3>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode sql"><code class="sourceCode sql"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">INSERT</span> <span class="kw">INTO</span> auditoria.estaciones_trabajo</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    (identificador, nombre, direccion_ip, agente_navegador)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="kw">VALUES</span> (<span class="op">..</span>.)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="kw">ON</span> CONFLICT (identificador) DO <span class="kw">UPDATE</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">SET</span> ultimo_acceso <span class="op">=</span> <span class="fu">CURRENT_TIMESTAMP</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="kw">RETURNING</span> id_estacion <span class="kw">INTO</span> identificador_estacion;</span></code></pre></div>
+<ul>
+<li><strong>Entrada:</strong> huella SHA-256, nombre de estación, IP y
+cadena del navegador.</li>
+<li><code>ON CONFLICT</code> evita crear estaciones duplicadas cuando
+existe la misma huella.</li>
+<li><code>RETURNING</code> devuelve <code>id_estacion</code>, usado por
+el trigger como referencia.</li>
+<li><code>SECURITY DEFINER</code> significa que esta función usa
+privilegios de su propietario; por eso debe validar datos y mantener un
+<code>search_path</code> controlado.</li>
+</ul>
+<h3 id="53-función-b-registrar_cambio--el-corazón-del-proyecto">5.3
+Función B: <code>registrar_cambio()</code> — El corazón del
+proyecto</h3>
+<p><strong>B1. Validación del trigger.</strong></p>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode sql"><code class="sourceCode sql"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> id_tabla, version_configuracion, activa</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="kw">INTO</span> configuracion_tabla</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> auditoria.tablas_auditadas</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> id_tabla <span class="op">=</span> identificador_tabla</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">AND</span> nombre_esquema <span class="op">=</span> TG_TABLE_SCHEMA</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  <span class="kw">AND</span> nombre_tabla <span class="op">=</span> TG_TABLE_NAME;</span></code></pre></div>
+<p><code>TG_ARGV[0]</code> contiene el ID de configuración.
+<code>TG_TABLE_SCHEMA</code> y <code>TG_TABLE_NAME</code> identifican la
+tabla real. Se valida que el evento pertenezca a la tabla esperada y que
+la auditoría esté activa.</p>
+<p><strong>B2. Crear representaciones de OLD y NEW.</strong></p>
+<div class="sourceCode" id="cb15"><pre
+class="sourceCode sql"><code class="sourceCode sql"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="cf">IF</span> TG_OP <span class="op">=</span> <span class="st">&#39;INSERT&#39;</span> <span class="cf">THEN</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    registro_viejo <span class="op">:=</span> <span class="kw">NULL</span>;</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    registro_nuevo <span class="op">:=</span> to_jsonb(<span class="kw">NEW</span>);</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="cf">ELSIF</span> TG_OP <span class="op">=</span> <span class="st">&#39;DELETE&#39;</span> <span class="cf">THEN</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    registro_viejo <span class="op">:=</span> to_jsonb(<span class="kw">OLD</span>);</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    registro_nuevo <span class="op">:=</span> <span class="kw">NULL</span>;</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="cf">ELSE</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>    registro_viejo <span class="op">:=</span> to_jsonb(<span class="kw">OLD</span>);</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>    registro_nuevo <span class="op">:=</span> to_jsonb(<span class="kw">NEW</span>);</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a><span class="cf">END</span> <span class="cf">IF</span>;</span></code></pre></div>
+<ul>
+<li><code>to_jsonb</code> transforma una fila, cuyas columnas pueden
+variar según la tabla, en un objeto JSONB.</li>
+<li>INSERT no tiene valor anterior; DELETE no tiene valor nuevo.</li>
+<li>Esta elección hace posible utilizar una <strong>sola
+función</strong> para distintas tablas de negocio.</li>
+</ul>
+<p><strong>B3. Decidir si existe un cambio que valga la pena
+guardar.</strong></p>
+<div class="sourceCode" id="cb16"><pre
+class="sourceCode sql"><code class="sourceCode sql"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="kw">AND</span> (TG_OP <span class="op">&lt;&gt;</span> <span class="st">&#39;UPDATE&#39;</span> <span class="kw">OR</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    (registro_viejo <span class="op">-&gt;</span> columna.nombre_columna)</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">IS</span> <span class="kw">DISTINCT</span> <span class="kw">FROM</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    (registro_nuevo <span class="op">-&gt;</span> columna.nombre_columna))</span></code></pre></div>
+<ul>
+<li><code>-&gt;</code> extrae el valor JSONB de una columna.</li>
+<li><code>IS DISTINCT FROM</code> compara correctamente también cuando
+hay NULL.</li>
+<li>Si el usuario hace UPDATE pero las columnas auditadas no cambian, la
+función no inserta evento.</li>
+</ul>
+<p><strong>B4. Encontrar la clave primaria.</strong> El código consulta
+<code>pg_index</code> y <code>pg_attribute</code> para descubrir qué
+columnas forman la clave primaria y construye un JSONB. Se admiten
+claves primarias compuestas. Si una tabla no tiene PK, se guarda
+<code>{}</code>; en ese caso debes interpretar el evento usando las
+instantáneas de fila.</p>
+<p><strong>B5. Identificar al autor.</strong> El código consulta la
+información que PHP envía mediante
+<code>set_config('autoaudit.usuario_id', ..., true)</code> y las claves
+de estación e IP. Si el cambio proviene de SQL ejecutado directamente en
+la BD, esas variables pueden estar vacías; en ese caso se conserva
+<code>session_user</code> de PostgreSQL.</p>
+<p><strong>B6. Insertar encabezado.</strong>
+<code>INSERT INTO auditoria.bitacora_eventos ... RETURNING id_evento</code>
+guarda toda la información del cambio e identifica el registro recién
+creado.</p>
+<p><strong>B7. Insertar detalles.</strong> El bucle
+<code>FOR columna_regla IN ... LOOP</code> recorre las columnas que
+tienen regla activa y crea sus entradas OLD/NEW en
+<code>bitacora_detalles</code>.</p>
+<p><strong>¿Y si la función falla?</strong> Al ejecutarse dentro de la
+misma transacción SQL que INSERT/UPDATE/DELETE, un error de trigger
+revierte también el cambio origen. Esto evita cambios de negocio
+confirmados sin su bitácora, pero exige estudiar bien permisos y
+errores.</p>
+<h3 id="54-función-c-generar_triggers--generación-automática">5.4
+Función C: <code>generar_triggers()</code> — Generación automática</h3>
+<p>La función recibe un <code>identificador_tabla</code> y consulta cuál
+es el esquema y nombre exacto de la tabla. Verifica que sea una tabla
+ordinaria de <code>public</code> y que las columnas todavía existan.</p>
+<div class="sourceCode" id="cb17"><pre
+class="sourceCode sql"><code class="sourceCode sql"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>FOREACH tipo_operacion <span class="kw">IN</span> <span class="dt">ARRAY</span> <span class="dt">ARRAY</span>[<span class="st">&#39;INSERT&#39;</span>,<span class="st">&#39;UPDATE&#39;</span>,<span class="st">&#39;DELETE&#39;</span>]</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="cf">LOOP</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- Para cada tipo se reemplaza el trigger, si debe existir.</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">EXECUTE</span> format(<span class="st">&#39;DROP TRIGGER IF EXISTS %I ON %I.%I&#39;</span>, <span class="op">..</span>.);</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- Si hay reglas activas se crea otro trigger AFTER.</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">EXECUTE</span> format(<span class="st">&#39;CREATE TRIGGER %I AFTER %s ON %I.%I ...&#39;</span>, <span class="op">..</span>.);</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="cf">END</span> <span class="cf">LOOP</span>;</span></code></pre></div>
+<ul>
+<li><code>FOREACH</code> recorre los tres eventos de la lista
+cerrada.</li>
+<li><code>DROP TRIGGER IF EXISTS</code> evita duplicados al cambiar la
+configuración.</li>
+<li><code>format('%I', ...)</code> <strong>protege los identificadores
+SQL</strong> (nombres de tablas y triggers) y los cita
+correctamente.</li>
+<li><code>format('%L', ...)</code> cita el ID transmitido como argumento
+literal.</li>
+<li><code>%s</code> se usa <strong>solo</strong> con uno de tres valores
+constantes controlados (<code>INSERT</code>, <code>UPDATE</code>,
+<code>DELETE</code>), nunca directamente con texto del usuario.</li>
+<li>Se crea un trigger por tabla y operación activa, pero todos usan la
+función genérica <code>registrar_cambio()</code>.</li>
+</ul>
+<p>Una limitación explícita: el proyecto no soporta por diseño tablas
+particionadas, auditoría DDL, SELECT o <code>TRUNCATE</code>. Estos
+casos requieren un diseño adicional.</p>
+<h3
+id="55-función-d-configurar_tabla--convertir-selección-en-reglas">5.5
+Función D: <code>configurar_tabla()</code> — Convertir selección en
+reglas</h3>
+<p>Recibe un esquema, tabla y un JSONB como este:</p>
+<div class="sourceCode" id="cb18"><pre
+class="sourceCode json"><code class="sourceCode json"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;nombre&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;INSERT&quot;</span><span class="ot">,</span> <span class="st">&quot;UPDATE&quot;</span><span class="ot">,</span> <span class="st">&quot;DELETE&quot;</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;telefono&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;UPDATE&quot;</span><span class="ot">,</span> <span class="st">&quot;DELETE&quot;</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;correo&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;UPDATE&quot;</span><span class="ot">]</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<p><strong>D1.</strong> Valida que la tabla exista en el catálogo del
+DBMS. <strong>D2.</strong> Inserta o actualiza
+<code>tablas_auditadas</code>, sube la versión y bloquea la fila durante
+el proceso. <strong>D3.</strong> Reemplaza las reglas vigentes después
+de comprobar que cada columna y cada operación existen.
+<strong>D4.</strong> Ejecuta <code>generar_triggers()</code>.</p>
+<p>Todo ocurre en una operación SQL: si los nuevos triggers no pueden
+instalarse, la modificación de reglas tampoco debe quedar
+confirmada.</p>
+<h3 id="56-función-e-cambiar_estado">5.6 Función E:
+<code>cambiar_estado()</code></h3>
+<div class="sourceCode" id="cb19"><pre
+class="sourceCode sql"><code class="sourceCode sql"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="kw">UPDATE</span> auditoria.tablas_auditadas</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>   <span class="kw">SET</span> activa <span class="op">=</span> estado_deseado,</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>       version_configuracion <span class="op">=</span> version_configuracion <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a> <span class="kw">WHERE</span> id_tabla <span class="op">=</span> identificador_tabla;</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>PERFORM auditoria.generar_triggers(identificador_tabla);</span></code></pre></div>
+<p><strong>Pausar</strong> retira los triggers mediante el generador.
+<strong>Reactivar</strong> los reconstruye siguiendo las reglas
+almacenadas. Ninguna de estas acciones borra
+<code>bitacora_eventos</code> ni <code>bitacora_detalles</code>.</p>
+<hr />
+<h2 id="6-bloques-php-qué-hace-el-servidor-y-por-qué">6. Bloques PHP:
+qué hace el servidor y por qué</h2>
+<h3 id="61-basedatosphp--conectar-una-sola-vez">6.1
+<code>BaseDatos.php</code> — Conectar una sola vez</h3>
+<div class="sourceCode" id="cb20"><pre
+class="sourceCode php"><code class="sourceCode php"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="va">$conexion_compartida</span> <span class="op">=</span> <span class="kw">new</span> <span class="bu">PDO</span>(</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;pgsql:host=</span>{<span class="va">$servidor</span>}<span class="st">;port=</span>{<span class="va">$puerto</span>}<span class="st">;dbname=</span>{<span class="va">$nombre_base_datos</span>}<span class="st">&quot;</span><span class="ot">,</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">$nombre_usuario</span><span class="ot">,</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    <span class="va">$contrasena</span><span class="ot">,</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    [<span class="bu">PDO</span>::<span class="cn">ATTR_ERRMODE</span> =&gt; <span class="bu">PDO</span>::<span class="cn">ERRMODE_EXCEPTION</span>]</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>)<span class="ot">;</span></span></code></pre></div>
+<ul>
+<li><code>PDO</code>: interfaz común de PHP para conectarse a bases de
+datos.</li>
+<li><code>pgsql:</code>: el controlador es PostgreSQL.</li>
+<li><code>$servidor</code>, <code>$puerto</code>,
+<code>$nombre_base_datos</code>: ubicación de la BD.</li>
+<li><code>$nombre_usuario</code> / <code>$contrasena</code>:
+credenciales del rol limitado <code>autoaudit_aplicacion</code>.</li>
+<li><code>ATTR_ERRMODE =&gt; ERRMODE_EXCEPTION</code>: si PostgreSQL
+rechaza una consulta, PHP puede capturar el error.</li>
+</ul>
+<p>No confundas el rol de la base con el usuario que inicia sesión en
+AutoAudit: son identidades distintas.</p>
+<h3 id="62-seguridadphp--protección-de-formularios">6.2
+<code>Seguridad.php</code> — Protección de formularios</h3>
+<ul>
+<li><code>usuario_autenticado()</code>: devuelve el usuario web guardado
+en la sesión.</li>
+<li><code>requerir_sesion()</code>: bloquea visitas no
+autenticadas.</li>
+<li><code>requerir_administrador()</code>: restringe la configuración de
+triggers.</li>
+<li><code>escapar_html()</code>: transforma texto potencialmente
+peligroso para mostrarlo sin ejecutar etiquetas HTML.</li>
+<li><code>token_csrf()</code> y <code>comprobar_csrf()</code>: impiden
+aceptar formularios que no tengan el token de sesión esperado.</li>
+<li><code>avisar()</code> e <code>ir_a()</code>: muestran mensajes y
+redirigen después del POST.</li>
+</ul>
+<h3 id="63-seguridadphp--asociar-usuario-web-con-un-trigger">6.3
+<code>Seguridad.php</code> — Asociar usuario web con un trigger</h3>
+<div class="sourceCode" id="cb21"><pre
+class="sourceCode php"><code class="sourceCode php"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="va">$conexion</span>-&gt;beginTransaction()<span class="ot">;</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="co">// crear/obtener id_estacion</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="co">// set_config(&#39;autoaudit.usuario_id&#39;, &#39;...&#39;, true)</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="co">// realizar INSERT/UPDATE/DELETE sobre clientes</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="va">$conexion</span>-&gt;commit()<span class="ot">;</span></span></code></pre></div>
+<p>¿Por qué se usa una transacción? La variable
+<code>autoaudit.usuario_id</code> se define con el último argumento
+<code>true</code>, que la limita <strong>a esa misma
+transacción</strong>. Cuando el UPDATE dispara el trigger, PostgreSQL ya
+puede saber quién actuó en la interfaz.</p>
+<p>Si ocurre una excepción, <code>rollBack()</code> deshace los cambios.
+<code>hash('sha256', ...)</code> crea una huella para estación usando IP
+y User-Agent. La IP se lee desde <code>REMOTE_ADDR</code>, sin confiar
+ciegamente en cabeceras <code>X-Forwarded-For</code>.</p>
+<h3 id="64-consultasphp--descubrir-tablas-reales">6.4
+<code>Consultas.php</code> — Descubrir tablas reales</h3>
+<div class="sourceCode" id="cb22"><pre
+class="sourceCode sql"><code class="sourceCode sql"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> espacio.nspname <span class="kw">AS</span> esquema, clase.relname <span class="kw">AS</span> tabla</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> pg_catalog.pg_class clase</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> pg_catalog.pg_namespace espacio</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">ON</span> espacio.<span class="kw">oid</span> <span class="op">=</span> clase.relnamespace</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> espacio.nspname<span class="op">=</span><span class="st">&#39;public&#39;</span> <span class="kw">AND</span> clase.relkind<span class="op">=</span><span class="st">&#39;r&#39;</span>;</span></code></pre></div>
+<p>No se usa una lista fija de tablas. PostgreSQL guarda metadatos sobre
+sus tablas en <code>pg_catalog</code>. <code>relkind='r'</code>
+significa tabla ordinaria.</p>
+<p>El método <code>obtener_columnas_tabla()</code> utiliza
+<code>pg_attribute</code> y <code>format_type</code> para recuperar
+nombre y tipo de cada columna.</p>
+<h3 id="65-consultasphp--búsquedas-sql-parametrizadas">6.5
+<code>Consultas.php</code> — Búsquedas SQL parametrizadas</h3>
+<div class="sourceCode" id="cb23"><pre
+class="sourceCode php"><code class="sourceCode php"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="va">$condiciones</span>[] <span class="op">=</span> <span class="st">&#39;evento.id_usuario = :usuario&#39;</span><span class="ot">;</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="va">$parametros</span>[<span class="st">&#39;usuario&#39;</span>] <span class="op">=</span> <span class="va">$filtros</span>[<span class="st">&#39;usuario&#39;</span>]<span class="ot">;</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="va">$consulta</span> <span class="op">=</span> <span class="va">$conexion</span>-&gt;prepare(<span class="va">$consulta_sql</span>)<span class="ot">;</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="va">$consulta</span>-&gt;bindValue(<span class="st">&#39;:usuario&#39;</span><span class="ot">,</span> <span class="va">$valor</span><span class="ot">,</span> <span class="bu">PDO</span>::<span class="cn">PARAM_INT</span>)<span class="ot">;</span></span></code></pre></div>
+<p><code>:usuario</code> es un <strong>parámetro</strong>, no una cadena
+concatenada al SQL. PDO transporta el valor separadamente, para reducir
+el riesgo de inyección SQL. La consulta también maneja
+<code>tabla</code>, <code>operacion</code>, <code>columna</code>,
+<code>desde</code>, <code>hasta</code> y paginación.</p>
+<h3 id="66-presentacionphp--bootstrap">6.6 <code>Presentacion.php</code>
+— Bootstrap</h3>
+<p>Este archivo dibuja el menú, la estructura HTML, los mensajes y el
+pie de página. Importa Bootstrap CSS/JS 5.3.8 desde CDN y carga
+<code>estilos.css</code> local para el aspecto de AutoAudit.</p>
+<p>Bootstrap ofrece componentes visuales: <code>container</code>,
+<code>row</code>, <code>col-md-4</code>, <code>card</code> o panel,
+<code>btn</code>, <code>table</code>, <code>modal</code>,
+<code>alert</code>, etc. Por ejemplo:</p>
+<div class="sourceCode" id="cb24"><pre
+class="sourceCode html"><code class="sourceCode html"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">button</span><span class="ot"> class</span><span class="op">=</span><span class="st">&quot;btn btn-primary&quot;</span><span class="dt">&gt;</span>Guardar reglas y generar triggers<span class="dt">&lt;/</span><span class="kw">button</span><span class="dt">&gt;</span></span></code></pre></div>
+<p>El atributo <code>class</code> controla el estilo. <strong>No ejecuta
+SQL</strong>: la acción ocurre cuando el formulario llega al servidor
+PHP.</p>
+<h3 id="67-indexphp--el-controlador-que-conecta-todo">6.7
+<code>index.php</code> — El controlador que conecta todo</h3>
+<p>Este es el flujo de un formulario:</p>
+<ol type="1">
+<li>El navegador envía <code>POST</code>, <code>accion</code> y
+<code>token_csrf</code>.</li>
+<li><code>index.php</code> valida el token y la sesión.</li>
+<li>Si <code>accion = guardar_configuracion</code>, verifica el rol de
+administrador.</li>
+<li>Comprueba la tabla y las columnas contra el catálogo real.</li>
+<li>Convierte la selección a JSONB.</li>
+<li>Ejecuta <code>SELECT auditoria.configurar_tabla(...)</code> usando
+parámetros.</li>
+<li>PostgreSQL guarda reglas y genera triggers automáticamente.</li>
+<li>PHP redirige a la configuración y muestra un mensaje.</li>
+</ol>
+<p>El laboratorio hace algo similar con <code>crear_cliente</code>,
+<code>actualizar_cliente</code> y <code>eliminar_cliente</code>, pero
+rodea el cambio de una transacción con contexto de usuario.</p>
+<p><strong>Importante sobre el CSV:</strong> <code>exportar</code> se
+procesa <strong>antes</strong> de imprimir HTML para enviar cabeceras de
+descarga correctas. Se exporta como máximo 10,000 eventos por descarga;
+es una protección de consumo de memoria, no una garantía de exportación
+masiva sin límites.</p>
+<hr />
+<h2 id="7-diccionario-de-variables-nombres-en-español">7. Diccionario de
+variables: nombres en español</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Nombre</th>
+<th>Dónde aparece</th>
+<th>Significado</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>identificador_tabla</code></td>
+<td>PL/pgSQL</td>
+<td>ID de la configuración de tabla</td>
+</tr>
+<tr class="even">
+<td><code>configuracion_tabla</code></td>
+<td>PL/pgSQL</td>
+<td>Fila actual de tabla y su versión</td>
+</tr>
+<tr class="odd">
+<td><code>registro_viejo</code></td>
+<td>PL/pgSQL</td>
+<td>OLD como JSONB</td>
+</tr>
+<tr class="even">
+<td><code>registro_nuevo</code></td>
+<td>PL/pgSQL</td>
+<td>NEW como JSONB</td>
+</tr>
+<tr class="odd">
+<td><code>registro_clave</code></td>
+<td>PL/pgSQL</td>
+<td>Clave primaria de la fila modificada</td>
+</tr>
+<tr class="even">
+<td><code>numero_columnas</code></td>
+<td>PL/pgSQL</td>
+<td>Cantidad de columnas que ameritan un evento</td>
+</tr>
+<tr class="odd">
+<td><code>identificador_evento</code></td>
+<td>PL/pgSQL</td>
+<td>ID del encabezado de bitácora recién creado</td>
+</tr>
+<tr class="even">
+<td><code>columna_regla</code></td>
+<td>PL/pgSQL</td>
+<td>Columna actual del bucle de detalles</td>
+</tr>
+<tr class="odd">
+<td><code>tipo_operacion</code></td>
+<td>PL/pgSQL</td>
+<td>INSERT, UPDATE o DELETE</td>
+</tr>
+<tr class="even">
+<td><code>nombre_disparador</code></td>
+<td>PL/pgSQL</td>
+<td>Nombre del trigger generado</td>
+</tr>
+<tr class="odd">
+<td><code>reglas_recibidas</code></td>
+<td>PL/pgSQL</td>
+<td>Objeto JSONB de reglas por columna</td>
+</tr>
+<tr class="even">
+<td><code>eventos_columna</code></td>
+<td>PL/pgSQL</td>
+<td>Lista de operaciones de una columna</td>
+</tr>
+<tr class="odd">
+<td><code>conexion_compartida</code></td>
+<td>PHP</td>
+<td>Objeto PDO reutilizado en la solicitud</td>
+</tr>
+<tr class="even">
+<td><code>usuario_autenticado</code></td>
+<td>PHP / sesión</td>
+<td>Usuario web que inició sesión</td>
+</tr>
+<tr class="odd">
+<td><code>accion_solicitada</code></td>
+<td>PHP</td>
+<td>Valor que distingue qué formulario se envió</td>
+</tr>
+<tr class="even">
+<td><code>reglas_validas</code></td>
+<td>PHP</td>
+<td>Reglas comprobadas antes de transmitirlas a PostgreSQL</td>
+</tr>
+<tr class="odd">
+<td><code>filtros</code></td>
+<td>PHP</td>
+<td>Tabla, usuario, operación, columna y fechas buscadas</td>
+</tr>
+<tr class="even">
+<td><code>condiciones</code></td>
+<td>PHP</td>
+<td>Fragmentos WHERE fijos y seleccionados por la app</td>
+</tr>
+<tr class="odd">
+<td><code>parametros</code></td>
+<td>PHP</td>
+<td>Valores transmitidos separadamente a SQL</td>
+</tr>
+<tr class="even">
+<td><code>direccion_ip</code></td>
+<td>PHP y SQL</td>
+<td>IP asociada al cambio</td>
+</tr>
+<tr class="odd">
+<td><code>identificador_estacion</code></td>
+<td>PHP</td>
+<td>SHA-256 del contexto de navegador/IP</td>
+</tr>
+<tr class="even">
+<td><code>token_csrf</code></td>
+<td>PHP</td>
+<td>Token que protege los formularios POST</td>
+</tr>
+</tbody>
+</table>
+<p>Los nombres especiales <code>NEW</code>, <code>OLD</code>,
+<code>TG_OP</code>, <code>TG_RELID</code>, <code>TG_ARGV</code>,
+<code>CURRENT_TIMESTAMP</code> y las palabras clave SQL permanecen en
+inglés porque <strong>son nombres reservados del lenguaje</strong>, no
+variables que convenga traducir.</p>
+<hr />
+<h2 id="8-comprender-los-diagramas">8. Comprender los diagramas</h2>
+<h3 id="81-casos-de-uso-01">8.1 Casos de uso (01)</h3>
+<p>El administrador puede configurar tablas, generar triggers y usar el
+laboratorio. Un usuario de rol <code>consulta</code> entra al historial
+y exporta reportes. Las funciones de configuración se protegen por
+permisos web. El laboratorio, en esta demostración, está accesible a
+usuarios autenticados.</p>
+<h3 id="82-clases-02">8.2 Clases (02)</h3>
+<p>Representa las entidades como clases con atributos y relaciones. Un
+objeto de <code>TablaAuditada</code> tiene varias
+<code>ColumnaAuditada</code>; cada una tiene varias
+<code>ReglaAuditoria</code>. Un evento contiene varios detalles.</p>
+<h3 id="83-secuencia-de-configuración-03">8.3 Secuencia de configuración
+(03)</h3>
+<p>Explica qué sucede <strong>en orden temporal</strong> cuando se
+marcan casillas: administrador → navegador → PHP → función SQL →
+generador de triggers → PostgreSQL.</p>
+<h3 id="84-secuencia-de-auditoría-04">8.4 Secuencia de auditoría
+(04)</h3>
+<p>Explica la actualización del cliente desde el navegador y cómo,
+dentro de la misma transacción, el trigger compara OLD/NEW y escribe
+bitácora.</p>
+<h3 id="85-actividad-05">8.5 Actividad (05)</h3>
+<p>Muestra decisiones: ¿administrador? ¿existe regla activa? ¿la columna
+realmente cambió? Su propósito es entender el flujo, no el SQL
+exacto.</p>
+<h3 id="86-componentes-06">8.6 Componentes (06)</h3>
+<p>Separa el servidor web PHP del motor PostgreSQL y representa sus
+conexiones y funciones principales, desplegados en contenedores sobre el
+anfitrión Ubuntu.</p>
+<h3 id="87-entidad-relación-07">8.7 Entidad-relación (07)</h3>
+<p>Se centra en PK, FK y cardinalidades de las siete tablas del esquema
+auditoría. <strong>Es distinto del diagrama de clases UML</strong>:
+describe el almacenamiento real en el motor. Para tipos y restricciones
+completos, abre <code>Diccionario_de_Datos.md</code>.</p>
+<p>Todos los archivos <code>.puml</code> se pueden editar en PlantUML.
+Los <code>.dot</code> generan imágenes con Graphviz. Los
+<code>.svg</code> son ampliables sin perder calidad; las
+<code>.png</code> se insertan fácilmente en documentos.</p>
+<hr />
+<h2 id="9-pruebas-de-validación-importantes-para-tu-exposición">9.
+Pruebas de validación (importantes para tu exposición)</h2>
+<h3 id="91-ejecutar-las-pruebas-desde-la-terminal">9.1 Ejecutar las
+pruebas desde la terminal</h3>
+<p>Desde el directorio del proyecto:</p>
+<div class="sourceCode" id="cb25"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> compose exec <span class="at">-T</span> bd psql <span class="at">-U</span> postgres <span class="at">-d</span> autoaudit <span class="at">-v</span> ON_ERROR_STOP=1 <span class="op">&lt;</span> base_de_datos/pruebas/01_pruebas_funcionales.sql</span></code></pre></div>
+<p>Las pruebas verifican:</p>
+<ol type="1">
+<li>Que se generan <strong>tres triggers</strong> para la tabla de
+prueba.</li>
+<li>Que <code>INSERT</code> registra un evento.</li>
+<li>Que un <code>UPDATE</code> sin modificación real no genera evento
+nuevo.</li>
+<li>Que un <code>UPDATE</code> diferente conserva los valores OLD y
+NEW.</li>
+<li>Que <code>DELETE</code> preserva la instantánea aunque la fila
+desaparezca.</li>
+<li>Que pausar la auditoría elimina los triggers vigentes sin borrar el
+historial.</li>
+</ol>
+<p>Al finalizar, se ejecuta <strong>ROLLBACK</strong>, para que estas
+pruebas no alteren permanentemente tus reglas y datos.</p>
+<h3 id="92-consultas-para-revisar-manualmente">9.2 Consultas para
+revisar manualmente</h3>
+<div class="sourceCode" id="cb26"><pre
+class="sourceCode sql"><code class="sourceCode sql"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Qué reglas configuraste.</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> tabla.nombre_tabla, columna.nombre_columna, regla.operacion</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> auditoria.tablas_auditadas tabla</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> auditoria.columnas_auditadas columna <span class="kw">ON</span> columna.id_tabla<span class="op">=</span>tabla.id_tabla</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> auditoria.reglas_auditoria regla <span class="kw">ON</span> regla.id_columna<span class="op">=</span>columna.id_columna</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> tabla.nombre_tabla, columna.nombre_columna, regla.operacion;</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a><span class="co">-- Últimos 10 eventos (encabezados).</span></span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> id_evento, nombre_tabla, operacion, fecha_evento, clave_primaria</span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> auditoria.bitacora_eventos</span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> id_evento <span class="kw">DESC</span> <span class="kw">LIMIT</span> <span class="dv">10</span>;</span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a><span class="co">-- Historial detallado de la columna telefono.</span></span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> evento.fecha_evento, evento.operacion,</span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>       detalle.valor_anterior, detalle.valor_nuevo</span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> auditoria.bitacora_eventos evento</span>
+<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> auditoria.bitacora_detalles detalle <span class="kw">ON</span> detalle.id_evento<span class="op">=</span>evento.id_evento</span>
+<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> detalle.nombre_columna<span class="op">=</span><span class="st">&#39;telefono&#39;</span></span>
+<span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> evento.fecha_evento <span class="kw">DESC</span>;</span></code></pre></div>
+<h3 id="93-medir-rendimiento">9.3 Medir rendimiento</h3>
+<div class="sourceCode" id="cb27"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> compose exec <span class="at">-T</span> bd psql <span class="at">-U</span> postgres <span class="at">-d</span> autoaudit <span class="at">-v</span> ON_ERROR_STOP=1 <span class="op">&lt;</span> base_de_datos/pruebas/02_prueba_rendimiento.sql</span></code></pre></div>
+<p>El comando <code>EXPLAIN (ANALYZE, BUFFERS, SUMMARY)</code> muestra
+el tiempo que PostgreSQL invirtió procesando inserciones por lotes. El
+script compara dos volúmenes de registros (100 y 1,000) dentro de una
+transacción descartada con ROLLBACK.</p>
+<p><strong>No se puede afirmar que el impacto sea «insignificante» sin
+medirlo.</strong> Debes registrar tus tiempos reales, la versión del
+sistema y las características del equipo. Si quieres cuantificar
+sobrecarga, repite una prueba comparable con triggers desactivados y
+otra con activación.</p>
+<hr />
+<h2
+id="10-ejercicios-para-que-comprendas-el-código-y-puedas-modificarlo-solo">10.
+Ejercicios para que comprendas el código y puedas modificarlo solo</h2>
+<p><strong>Ejercicio 1 — Identificación.</strong> Busca en
+<code>registrar_cambio()</code> las líneas donde se convierten
+<code>OLD</code> y <code>NEW</code> a JSONB. Anota qué valor es NULL
+para INSERT y DELETE.</p>
+<p><strong>Ejercicio 2 — Reglas.</strong> En
+<code>configurar_tabla()</code> observa cómo se valida el nombre de
+columna consultando <code>pg_attribute</code>. Intenta enviar una
+columna inexistente y verifica que PostgreSQL rechaza la
+configuración.</p>
+<p><strong>Ejercicio 3 — Cambios reales.</strong> Desde el laboratorio,
+edita un cliente sin cambiar el teléfono. Luego edita únicamente el
+teléfono. Comprueba cuántos eventos UPDATE aparecen si solo auditaste
+teléfono.</p>
+<p><strong>Ejercicio 4 — Nueva tabla.</strong> Abre PostgreSQL y crea
+una tabla sencilla
+<code>public.proveedores (id_proveedor BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, nombre TEXT NOT NULL)</code>.
+La tabla aparecerá en Configuración porque se consulta el catálogo.
+Puedes crear reglas y auditar operaciones hechas en SQL. Para que una
+página PHP la edite, necesitarás permisos y un formulario nuevo.</p>
+<p><strong>Ejercicio 5 — Cambio de nombre.</strong> Cambia el nombre de
+una columna origen en una tabla de laboratorio; intenta regenerar
+triggers. Explica por qué el sistema advierte que una regla se refiere a
+una columna inexistente.</p>
+<p><strong>Ejercicio 6 — Filtro SQL.</strong> Ubica
+<code>construir_consulta_historial()</code> y explica por qué utiliza
+<code>:usuario</code>, <code>:columna</code> y <code>:limite</code> en
+vez de concatenar entradas de texto del navegador.</p>
+<p><strong>Ejercicio 7 — Seguridad.</strong> Intenta conectarte como
+<code>autoaudit_aplicacion</code> y modificar directamente
+<code>auditoria.bitacora_eventos</code>. Debe rechazarse porque no se
+concedieron permisos directos de escritura sobre la bitácora.</p>
+<p><strong>Ejercicio 8 — Versionado.</strong> Configura la tabla, cambia
+la selección de operaciones y revisa <code>version_configuracion</code>
+en nuevos eventos. Explica cómo permite saber qué reglas estaban
+vigentes cuando se registró un cambio.</p>
+<hr />
+<h2 id="11-problemas-frecuentes-y-soluciones">11. Problemas frecuentes y
+soluciones</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Síntoma</th>
+<th>Causa posible</th>
+<th>Cómo revisar</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>docker: command not found</code></td>
+<td>Docker no instalado o no configurado</td>
+<td>Revisar <code>docker --version</code> y la guía oficial</td>
+</tr>
+<tr class="even">
+<td><code>docker compose</code> no existe</td>
+<td>Falta el complemento Compose</td>
+<td>Instalar y revisar <code>docker compose version</code></td>
+</tr>
+<tr class="odd">
+<td>Puerto <code>8080</code> ocupado</td>
+<td>Otro servicio utiliza ese puerto</td>
+<td>Cambiar <code>PUERTO_WEB</code> en <code>.env</code></td>
+</tr>
+<tr class="even">
+<td>Puerto <code>5433</code> ocupado</td>
+<td>Ya existe otro PostgreSQL o servicio</td>
+<td>Cambiar <code>PUERTO_POSTGRES</code></td>
+</tr>
+<tr class="odd">
+<td>Error 500 en PHP</td>
+<td>Error en credenciales, inicialización o SQL</td>
+<td><code>docker compose logs --tail=100 web bd</code></td>
+</tr>
+<tr class="even">
+<td>Usuario web no ingresa</td>
+<td>Clave equivocada o volumen inicializado con otra clave</td>
+<td>Revisar valores usados en <strong>primer</strong> arranque</td>
+</tr>
+<tr class="odd">
+<td>No aparece un evento UPDATE</td>
+<td>No seleccionaste esa columna o no cambió su valor</td>
+<td>Revisar Configuración y Detalle</td>
+</tr>
+<tr class="even">
+<td>Hay reglas, pero no triggers</td>
+<td>Tabla pausada, columna eliminada o error al instalar</td>
+<td>Ejecutar consulta <code>information_schema.triggers</code></td>
+</tr>
+<tr class="odd">
+<td>Bootstrap se ve sin formato</td>
+<td>El navegador no accede a CDN</td>
+<td>Verificar Internet o colocar copia local autorizada</td>
+</tr>
+<tr class="even">
+<td>Error <code>permission denied</code> al probar otra tabla</td>
+<td>El rol app no tiene permiso DML sobre esa tabla</td>
+<td>Usar psql como admin o conceder solo permisos necesarios</td>
+</tr>
+<tr class="odd">
+<td>Estación/usuario nulos en un cambio SQL</td>
+<td>Operación hecha directamente desde PostgreSQL</td>
+<td>El contexto web solo se conoce si se transmite</td>
+</tr>
+<tr class="even">
+<td><code>relation ... does not exist</code></td>
+<td>No se inicializó bien la BD o tabla mal nombrada</td>
+<td>Revisar logs iniciales de <code>bd</code> y
+<code>\dt auditoria.*</code></td>
+</tr>
+<tr class="odd">
+<td>No se actualiza un SQL corregido</td>
+<td>El volumen ya tenía la BD creada</td>
+<td>Aplicar una migración manual; reiniciar contenedores no repite
+scripts</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Precaución:</strong> si vas a modificar funciones SQL después
+de la primera inicialización, entra a la BD y ejecuta el archivo de
+funciones para reemplazarlas; NO borres datos con <code>down -v</code>
+sin saber sus consecuencias:</p>
+<div class="sourceCode" id="cb28"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> compose exec <span class="at">-T</span> bd psql <span class="at">-U</span> postgres <span class="at">-d</span> autoaudit <span class="at">-v</span> ON_ERROR_STOP=1 <span class="op">&lt;</span> base_de_datos/inicializacion/03_funciones.sql</span></code></pre></div>
+<hr />
+<h2 id="12-conceptos-de-seguridad-y-límites-de-la-demostración">12.
+Conceptos de seguridad y límites de la demostración</h2>
+<ul>
+<li>Las consultas de la interfaz utilizan <strong>PDO
+parametrizado</strong>; las partes dinámicas de triggers usan
+<code>format('%I', ...)</code> para nombres de objetos verificados
+contra el catálogo.</li>
+<li>Las contraseñas web se guardan como hash <strong>bcrypt</strong>, no
+texto plano.</li>
+<li>Las acciones POST usan token <strong>CSRF</strong> y las respuestas
+HTML escapan texto de usuarios.</li>
+<li>La cuenta <code>autoaudit_aplicacion</code> <strong>no puede
+modificar directamente</strong> las tablas de bitácora, pero puede
+invocar funciones de configuración si obtiene acceso SQL a esa cuenta.
+Por eso también se debe proteger el servidor y las credenciales: en el
+diseño académico la verificación de rol para configurar está en
+PHP.</li>
+<li>La interfaz no admite <code>TRUNCATE</code>, <code>SELECT</code>,
+creación/eliminación de tablas ni cambios de esquema como eventos de
+auditoría.</li>
+<li>Las instantáneas JSONB almacenan <strong>todos los valores de
+fila</strong>, incluso columnas no seleccionadas, para preservar
+registros borrados. En un sistema real, esto requiere políticas de
+privacidad, retención y acceso a datos sensibles.</li>
+<li>No existe una forma infalible de identificar un usuario humano solo
+desde PostgreSQL si varios empleados comparten la misma cuenta de
+conexión y su aplicación no comunica identidad.</li>
+<li>Se recomienda en producción HTTPS, credenciales rotadas, gestor de
+secretos, redes privadas, roles de BD por privilegio, copias de
+seguridad verificadas y auditoría protegida fuera del mismo
+servidor.</li>
+<li>Los contenedores Docker están publicados en
+<strong>localhost</strong>, apropiado para laboratorio. No publiques los
+puertos a Internet sin revisar autenticación, TLS y controles de
+red.</li>
+<li>El reporte CSV incluye datos que pueden ser sensibles. El código
+neutraliza celdas que parecen fórmulas de hoja de cálculo, pero se deben
+aplicar controles de acceso adecuados.</li>
+<li>Las pruebas incluidas usan <code>ASSERT</code> y
+<code>ROLLBACK</code> para minimizar el impacto sobre datos y
+configuraciones locales; no se deben aplicar indiscriminadamente a una
+BD de producción.</li>
+</ul>
+<hr />
+<h2 id="13-cómo-publicar-los-fuentes-en-github-o-gitlab">13. ¿Cómo
+publicar los fuentes en GitHub o GitLab?</h2>
+<p>El proyecto exige entregar el <strong>enlace</strong> a un
+repositorio. El ZIP es el código listo para subir, pero publicar el
+repositorio requiere iniciar sesión en <strong>tu propia
+cuenta</strong>.</p>
+<p>Desde la raíz del proyecto, luego de crear un repositorio vacío en
+GitHub o GitLab:</p>
+<div class="sourceCode" id="cb29"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> init</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> add .</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> commit <span class="at">-m</span> <span class="st">&quot;AutoAudit: base de datos, interfaz y documentacion&quot;</span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> branch <span class="at">-M</span> main</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> remote add origin URL_DE_TU_REPOSITORIO</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> push <span class="at">-u</span> origin main</span></code></pre></div>
+<p>Verifica que <code>.env</code> <strong>NO</strong> aparezca en
+<code>git status</code> ni en el repositorio. <code>.env.ejemplo</code>
+sí se debe compartir, porque no contiene claves reales (cambia sus
+contraseñas antes de usarlo).</p>
+<p>En la entrega añade el enlace del repositorio y el PDF del manual.
+También puedes agregar capturas del Panel, Configuración, Laboratorio,
+Historial, Detalle y pruebas con la salida de la terminal.</p>
+<hr />
+<h2 id="14-guion-recomendado-para-defender-el-proyecto">14. Guion
+recomendado para defender el proyecto</h2>
+<ol type="1">
+<li><strong>Necesidad:</strong> «Cuando alguien modifica o elimina un
+dato, necesitamos un historial verificable».</li>
+<li><strong>Arquitectura:</strong> «PHP + Bootstrap son la interfaz;
+PostgreSQL 18 ejecuta la lógica principal».</li>
+<li><strong>Configuración:</strong> «No escribimos manualmente cada
+trigger; elegimos tablas, columnas y operaciones».</li>
+<li><strong>Automatización:</strong> «<code>configurar_tabla()</code>
+valida los metadatos y <code>generar_triggers()</code> crea los triggers
+AFTER».</li>
+<li><strong>Auditoría:</strong> «<code>registrar_cambio()</code> compara
+OLD y NEW y guarda encabezado más detalles».</li>
+<li><strong>Seguridad:</strong> «El usuario web puede consultar,
+mientras que las tablas de bitácora tienen permisos restringidos».</li>
+<li><strong>Pruebas:</strong> «Demostramos INSERT, UPDATE, DELETE,
+valores anteriores y posteriores, filtros y CSV».</li>
+<li><strong>Limitación conocida:</strong> «Es una implementación
+académica para tablas ordinarias <code>public</code>, no una plataforma
+universal de auditoría de producción».</li>
+</ol>
+<h3 id="preguntas-típicas-que-podría-hacer-el-docente">Preguntas típicas
+que podría hacer el docente</h3>
+<p><strong>¿Qué ocurre si edito una columna no auditada?</strong> Si no
+cambia ninguna columna con regla UPDATE, no se crea evento.</p>
+<p><strong>¿Para qué se usa JSONB?</strong> Para almacenar instantáneas
+de filas con estructuras distintas; por ejemplo, clientes tiene campos
+diferentes a productos.</p>
+<p><strong>¿Por qué se usa un trigger AFTER?</strong> Porque el
+requisito pide capturar cambios tras la operación; el trigger ve el
+valor resultante y guarda la evidencia dentro de la misma
+transacción.</p>
+<p><strong>¿En qué se diferencia el generador de hacer manualmente un
+CREATE TRIGGER?</strong> El generador consulta una tabla de
+configuración y construye automáticamente el SQL para las operaciones
+activas de cada tabla.</p>
+<p><strong>¿Qué pasa con un DELETE?</strong> La fila desaparece de la
+tabla origen, pero su <code>registro_anterior</code> sigue en
+<code>bitacora_eventos</code>.</p>
+<p><strong>¿Qué pasa si desactivo auditoría?</strong> Se eliminan los
+triggers vigentes para esa tabla; los eventos históricos permanecen.</p>
+<p><strong>¿Qué pasa si falla la inserción en la bitácora?</strong>
+PostgreSQL cancela la sentencia de negocio dentro de la transacción para
+conservar consistencia; la aplicación muestra error y realiza
+ROLLBACK.</p>
+<hr />
+<h2 id="15-checklist-de-entrega">15. Checklist de entrega</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />El ZIP fue descomprimido y
+<code>docker compose up -d --build</code> funciona.</label></li>
+<li><label><input type="checkbox" />Puedes iniciar sesión con tu
+administrador.</label></li>
+<li><label><input type="checkbox" />Configuraste
+<code>public.clientes</code> y verificaste los triggers en
+SQL.</label></li>
+<li><label><input type="checkbox" />Probaste INSERT, UPDATE y DELETE
+desde el laboratorio.</label></li>
+<li><label><input type="checkbox" />Observaste
+<code>registro_anterior</code>, <code>registro_nuevo</code>, usuario, IP
+y fecha.</label></li>
+<li><label><input type="checkbox" />Probaste filtro por usuario/columna
+y descargaste CSV.</label></li>
+<li><label><input type="checkbox" />Ejecutaste
+<code>01_pruebas_funcionales.sql</code> y obtuviste el resultado
+esperado.</label></li>
+<li><label><input type="checkbox" />Ejecutaste la medición de
+rendimiento y guardaste los tiempos observados.</label></li>
+<li><label><input type="checkbox" />Incluiste los diagramas UML y el
+diagrama entidad-relación en tu documentación.</label></li>
+<li><label><input type="checkbox" />Revisaste
+<code>Diccionario_de_Datos.md</code> y
+<code>Matriz_de_Cumplimiento.md</code>.</label></li>
+<li><label><input type="checkbox" />Publicaste el código en tu
+GitHub/GitLab y copiaste su enlace.</label></li>
+<li><label><input type="checkbox" />Confirmaste qué pide tu docente
+sobre capturas, fecha final y formato de exposición.</label></li>
+</ul>
+<hr />
+<h2 id="referencias-técnicas-para-ampliar">Referencias técnicas para
+ampliar</h2>
+<ul>
+<li>Documentación PostgreSQL 18, funciones PL/pgSQL y SQL dinámico:
+<code>https://www.postgresql.org/docs/18/plpgsql-statements.html</code></li>
+<li>Documentación PostgreSQL 18, CREATE TRIGGER:
+<code>https://www.postgresql.org/docs/18/sql-createtrigger.html</code></li>
+<li>Documentación PostgreSQL 18, visión general de triggers:
+<code>https://www.postgresql.org/docs/18/triggers.html</code></li>
+<li>Bootstrap 5.3, guía oficial:
+<code>https://getbootstrap.com/docs/5.3/getting-started/introduction/</code></li>
+<li>Docker, instalación oficial para Ubuntu:
+<code>https://docs.docker.com/engine/install/ubuntu/</code></li>
+</ul>
+<p><strong>Fin del manual.</strong> Recomendación de estudio: ejecuta el
+capítulo 4, después lee las funciones del capítulo 5 con el archivo SQL
+abierto en paralelo. No memorices la sintaxis antes de comprender cómo
+viaja un cambio desde el navegador a OLD/NEW y después a la
+bitácora.</p>
+</body>
+</html>

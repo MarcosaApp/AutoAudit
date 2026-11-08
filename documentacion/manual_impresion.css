@@ -1,0 +1,19 @@
+@page { size: A4; margin: 20mm 18mm 19mm; @bottom-center { content: "AutoAudit · Manual académico · Página " counter(page) " de " counter(pages); font: 9pt 'DejaVu Sans'; color: #617089; }}
+html,body { font-family: 'DejaVu Sans', 'Liberation Sans', sans-serif; font-size: 9pt; line-height: 1.5; color: #253149; }
+body { margin: 0; }
+h1 { font-size: 21pt; color: #253a78; line-height: 1.25; margin: 0 0 16pt; padding-bottom: 10pt; border-bottom: 3pt solid #7588dc; }
+h2 { font-size: 14.5pt; color: #304585; margin-top: 23pt; margin-bottom: 8pt; border-bottom: 1px solid #d4ddee; padding-bottom: 5pt; break-after: avoid; }
+h3 { font-size: 11pt; color: #304585; margin-top: 14pt; margin-bottom: 6pt; break-after: avoid; }
+p { margin: 5pt 0 9pt; orphans: 3; widows: 3; }
+ul,ol { margin: 4pt 0 10pt; padding-left: 20pt; }
+li { margin-bottom: 4pt; }
+strong { color: #17274a; }
+pre { border: 1px solid #dbe5fa; border-left: 3px solid #7588dc; border-radius: 4px; background: #f4f7fd; padding: 8pt; font-family: 'DejaVu Sans Mono', monospace; font-size: 7.3pt; white-space: pre-wrap; overflow-wrap: anywhere; break-inside: avoid; }
+code { font-family: 'DejaVu Sans Mono', monospace; font-size: 8pt; }
+table { width: 100%; border-collapse: collapse; margin: 8pt 0 12pt; font-size: 7.3pt; table-layout: auto; }
+th { text-align: left; background: #e8edfa; color: #263771; }
+th,td { border: 1px solid #cfd9ea; padding: 4.5pt 5pt; vertical-align: top; overflow-wrap: anywhere; }
+tr { break-inside: avoid; }
+blockquote { border-left: 3pt solid #7588dc; padding-left: 10pt; color: #586985; }
+a { color: #274aaf; text-decoration: none; overflow-wrap: anywhere; }
+hr { border: 0; border-top: 1px solid #d8deea; margin: 15pt 0; }

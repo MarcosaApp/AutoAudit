@@ -1,0 +1,42 @@
+# Despliegue reproducible: funciona en Docker Engine + Compose en Ubuntu 26.04 LTS.
+services:
+  bd:
+    image: postgres:18
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: autoaudit
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Configura POSTGRES_PASSWORD en .env}
+      AUTOAUDIT_CLAVE_APP: ${AUTOAUDIT_CLAVE_APP:?Configura AUTOAUDIT_CLAVE_APP en .env}
+      AUTOAUDIT_ADMIN_USUARIO: ${AUTOAUDIT_ADMIN_USUARIO:?Configura usuario inicial}
+      AUTOAUDIT_ADMIN_CLAVE: ${AUTOAUDIT_ADMIN_CLAVE:?Configura clave inicial}
+    volumes:
+      - datos_postgres:/var/lib/postgresql
+      - ./base_de_datos/inicializacion:/docker-entrypoint-initdb.d:ro
+    ports:
+      - "127.0.0.1:${PUERTO_POSTGRES:-5433}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U postgres -d autoaudit"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    environment:
+      DB_SERVIDOR: bd
+      DB_PUERTO: '5432'
+      DB_NOMBRE: autoaudit
+      DB_USUARIO: autoaudit_aplicacion
+      DB_CLAVE: ${AUTOAUDIT_CLAVE_APP:?Configura AUTOAUDIT_CLAVE_APP en .env}
+    depends_on:
+      bd:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:${PUERTO_WEB:-8080}:80"
+    restart: unless-stopped
+
+volumes:
+  datos_postgres:

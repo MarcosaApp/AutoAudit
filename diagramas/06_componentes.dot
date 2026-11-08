@@ -1,0 +1,27 @@
+digraph UML {
+    graph [rankdir=LR, fontname="DejaVu Sans", fontsize=11, bgcolor="white",
+           nodesep=0.55, ranksep=0.7, pad=0.3, splines=polyline];
+    node [fontname="DejaVu Sans", fontsize=10, shape=box, style="rounded,filled",
+          color="#7c8eae", fillcolor="#edf2fc", margin="0.20,0.13"];
+    edge [fontname="DejaVu Sans", fontsize=9, color="#62799c", arrowsize=0.8];
+    
+subgraph cluster_servidor { label="Servidor Ubuntu 26.04 LTS (Docker)"; color="#9eadd1";
+subgraph cluster_web { label="Contenedor web: PHP 8.3 / Apache";
+bootstrap [label="Interfaz Bootstrap"];
+controlador [label="PHP: Controlador / PDO"];
+seguridad [label="Sesión / CSRF / roles"];
+}
+subgraph cluster_postgres {label="Contenedor BD: PostgreSQL 18";
+catalogo [label="Catálogo + tablas de reglas"];
+generador [label="Funciones PL/pgSQL"];
+clientes [label="public.clientes / productos"];
+bitacora [label="bitácora central"];
+}
+}
+bootstrap -> controlador -> seguridad;
+controlador -> catalogo [label="consultar / configurar"];
+controlador -> clientes [label="CRUD"];
+catalogo -> generador -> clientes [label="CREATE TRIGGER"];
+clientes -> bitacora [label="AFTER INSERT / UPDATE / DELETE"];
+
+}
